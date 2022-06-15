@@ -16,20 +16,21 @@ public class JobsDslExt extends ContextExtensionPoint {
     @DslExtensionMethod(context = StepContext.class)
     public AwsBatchBuilder aws_batch(String jobname, String jobdefinition,
                                      String command, String jobqueue,
-                                     int vcpu, int memory, int retries) {
+                                     int vcpu, int memory, int retries,
+                                     String shareidentifier, int schedulingpriorityoverride) {
         return new AwsBatchBuilder(jobname, jobdefinition,
                 command, jobqueue,
-                vcpu, memory, retries);
+                vcpu, memory, retries, shareidentifier, schedulingpriorityoverride);
     }
 
     @DslExtensionMethod(context = StepContext.class)
     public AwsBatchBuilder aws_batch(String jobname, String jobdefinition,
                                      List<String> command, String jobqueue,
-                                     int vcpu, int memory, int retries,
+                                     int vcpu, int memory, int retries, String shareidentifier, int schedulingpriorityoverride,
                                      Map<String, String> params, Map<String, String> environment) {
         return new AwsBatchBuilder(jobname, jobdefinition,
                 command, jobqueue,
-                vcpu, memory, retries,
+                vcpu, memory, retries,shareidentifier, schedulingpriorityoverride,
                 params, environment);
     }
 }

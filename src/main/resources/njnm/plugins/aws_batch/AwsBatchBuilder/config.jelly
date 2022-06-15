@@ -13,6 +13,14 @@
         <f:textbox />
     </f:entry>
 
+    <f:entry title="Share Identifier" field="shareidentifier">
+        <f:textbox />
+    </f:entry>
+
+    <f:entry title="Scheduling Priority Override" field="schedulingpriorityoverride">
+        <f:textbox />
+    </f:entry>
+
     <f:entry title="Retries" field="retries">
         <f:textbox />
     </f:entry>

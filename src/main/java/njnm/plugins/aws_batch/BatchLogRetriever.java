@@ -30,16 +30,19 @@ public class BatchLogRetriever {
 
     private final String jobID;
 
+    private final String jobName;
+
     // Pretty printing timestamps, is there a better way?
     private DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
 
-    public BatchLogRetriever(PrintStream logger, AWSBatch batch, String jobID, int time) {
+    public BatchLogRetriever(PrintStream logger, AWSBatch batch, String jobID, String jobName, int time) {
         this.logger = logger;
         this.batch = batch;
         this.jobID = jobID;
+        this.jobName = jobName;
         this.time = time;
-        df.setTimeZone(TimeZone.getTimeZone("UTC"));
+        df.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
     }
 
     private static class BatchJobDetail {
@@ -47,18 +50,21 @@ public class BatchLogRetriever {
         final JobStatus jobStatus;
         final int numAttempts;
         private final AttemptContainerDetail _container;
+        final String jobName;
 
         BatchJobDetail(DescribeJobsResult djr) {
             JobDetail detail = djr.getJobs().get(0);
             jobID = detail.getJobId();
+            jobName = detail.getJobName();
             jobStatus = JobStatus.fromValue(detail.getStatus());
             List<AttemptDetail> attempts = detail.getAttempts();
             numAttempts = attempts.size();
             _container = numAttempts > 0 ? attempts.get(numAttempts - 1).getContainer() : null;
         }
 
-        BatchJobDetail(String jobID){
+        BatchJobDetail(String jobID, String jobName){
             this.jobID = jobID;
+            this.jobName = jobName;
             jobStatus = null;
             numAttempts = 0;
             _container = null;
@@ -113,7 +119,7 @@ public class BatchLogRetriever {
 
     public void doLogging() throws InterruptedException, AbortException {
 
-        BatchJobDetail jd = new BatchJobDetail(jobID);
+        BatchJobDetail jd = new BatchJobDetail(jobID, jobName);
         boolean isAborted = false;
         while(!jd.isDone()){
             jd = singleLogStep(jd.jobStatus);
@@ -141,7 +147,7 @@ public class BatchLogRetriever {
         logger.printf("Finished with exit code %d%n", jd.getExitCode());
 
         try {
-            fetchCloudWatchLogs(jd.getStreamName(), logger);
+            fetchCloudWatchLogs(jd.getStreamName(), jobName, logger);
         } catch (Exception e){
             logger.printf("[%s] Fetching '%s' failed:%n", df.format(new Date()), jd.getStreamName());
             e.printStackTrace(logger);
@@ -159,17 +165,22 @@ public class BatchLogRetriever {
     }
 
 
-    private void fetchCloudWatchLogs(String logStreamName, PrintStream logger) {
+    private void fetchCloudWatchLogs(String logStreamName, String logGroupName, PrintStream logger) {
         if(logStreamName == null || "".equals(logStreamName)) return;
+
+        String lg = String.format("/aws/batch/%s-cwlg", logGroupName);
 
         logger.println("Fetching logs from cloudwatch logs for final attempt...");
         logger.println("-------------------------------------------------------");
+        logger.println(String.format("log group name is %s", lg));
 
         AWSLogs awslogs = AWSLogsClientBuilder.defaultClient();
 
+
+
         GetLogEventsResult logEventsResult =  awslogs.getLogEvents(
                 new GetLogEventsRequest()
-                        .withLogGroupName("/aws/batch/job")
+                        .withLogGroupName(String.format("/aws/batch/%s-cwlg", logGroupName))
                         .withLogStreamName(logStreamName)
         );
 

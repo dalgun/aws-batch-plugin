@@ -205,7 +205,7 @@ public class AwsBatchBuilder  extends Builder {
         SubmitJobResult sjr = awsbatch.submitJob(job);
         listener.getLogger().printf("Job Submitted:%n%s%n", sjr);
 
-        BatchLogRetriever retriever = new BatchLogRetriever(listener.getLogger(), awsbatch, sjr.getJobId(), getDescriptor().logPollingFreq);
+        BatchLogRetriever retriever = new BatchLogRetriever(listener.getLogger(), awsbatch, sjr.getJobId(), sjr.getJobName(), getDescriptor().logPollingFreq);
 
         retriever.doLogging();
 

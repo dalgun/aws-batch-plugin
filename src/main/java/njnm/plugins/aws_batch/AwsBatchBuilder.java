@@ -65,7 +65,7 @@ public class AwsBatchBuilder  extends Builder {
     public AwsBatchBuilder(String jobname, String jobdefinition,
                            String command, String jobqueue,
                            String vcpu, String memory, String retries,
-                           String shareidentifier, Integer schedulingpriorityoverride){/*,
+                           String shareidentifier, String schedulingpriorityoverride){/*,
                              HashMap<String, String> params,
                              HashMap<String, String> environment) {*/
         this.jobname = jobname;
@@ -76,7 +76,7 @@ public class AwsBatchBuilder  extends Builder {
         this.memory = parseIntOrNull(memory);
         this.retries = parseIntOrNull(retries);
         this.shareidentifier = shareidentifier;
-        this.schedulingpriorityoverride = schedulingpriorityoverride;
+        this.schedulingpriorityoverride = parseIntOrNull(schedulingpriorityoverride);
         this.params = null;
         this.environment = null;
     }

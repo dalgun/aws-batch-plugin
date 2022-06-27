@@ -14,11 +14,19 @@
     </f:entry>
 
     <f:entry title="Share Identifier" field="shareidentifier">
-        <f:textbox />
+        <select name="shareidentifier">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+        </select>
     </f:entry>
 
     <f:entry title="Scheduling Priority Override" field="schedulingpriorityoverride">
-        <f:textbox />
+        <select name="schedulingpriorityoverride">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+        </select>
     </f:entry>
 
     <f:entry title="Retries" field="retries">
